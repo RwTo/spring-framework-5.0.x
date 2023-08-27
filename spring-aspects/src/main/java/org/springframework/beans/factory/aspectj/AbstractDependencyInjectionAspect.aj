@@ -46,7 +46,7 @@ public abstract aspect AbstractDependencyInjectionAspect {
 	 */
 	@CodeGenerationHint(ifNameSuffix="6f1")
 	public pointcut mostSpecificSubTypeConstruction() :
-			if (thisJoinPoint.getSignature().getDeclaringType() == thisJoinPoint.getThis().getClass());
+			if (thisJoinPoint.getSignature().getDeclaringType().equals(thisJoinPoint.getThis().getClass()));
 
 	/**
 	 * Select join points in beans to be configured prior to construction?
