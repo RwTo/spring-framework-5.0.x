@@ -316,13 +316,16 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		if (logger.isInfoEnabled()) {
 			logger.info("Loading XML bean definitions from " + encodedResource);
 		}
-
+		/*
+		* 获取当前线程正在加载的资源，线程隔离
+		* */
 		Set<EncodedResource> currentResources = this.resourcesCurrentlyBeingLoaded.get();
 		if (currentResources == null) {
 			currentResources = new HashSet<>(4);
 			this.resourcesCurrentlyBeingLoaded.set(currentResources);
 		}
 		if (!currentResources.add(encodedResource)) {
+			/*当前资源正在加载中，又被加载，出现循环依赖，抛异常*/
 			throw new BeanDefinitionStoreException(
 					"Detected cyclic loading of " + encodedResource + " - check your import definitions!");
 		}
@@ -385,6 +388,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see #doLoadDocument
 	 * @see #registerBeanDefinitions
 	 */
+	/*
+	* 加载xml资源，同时返回 bean的数量
+	* */
 	protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
 			throws BeanDefinitionStoreException {
 		try {
@@ -425,7 +431,15 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see #setDocumentLoader
 	 * @see DocumentLoader#loadDocument
 	 */
+	/*
+	* 使用文档加载器加载文档
+	* */
 	protected Document doLoadDocument(InputSource inputSource, Resource resource) throws Exception {
+		/*
+		* 1. 获取解析器
+		* 2. 获取xml 的验证模式 DTD/XSD
+		* 3. 加载并获取Document对象
+		* */
 		return this.documentLoader.loadDocument(inputSource, getEntityResolver(), this.errorHandler,
 				getValidationModeForResource(resource), isNamespaceAware());
 	}
@@ -438,13 +452,18 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * mode, even when something other than {@link #VALIDATION_AUTO} was set.
 	 * @see #detectValidationMode
 	 */
+	/*
+	* 获取xml的验证模式，DTD/XSD
+	* */
 	protected int getValidationModeForResource(Resource resource) {
 		int validationModeToUse = getValidationMode();
 		if (validationModeToUse != VALIDATION_AUTO) {
+			//已经指定了验证模式
 			return validationModeToUse;
 		}
 		int detectedMode = detectValidationMode(resource);
 		if (detectedMode != VALIDATION_AUTO) {
+			//检测到的验证模式
 			return detectedMode;
 		}
 		// Hmm, we didn't get a clear indication... Let's assume XSD,

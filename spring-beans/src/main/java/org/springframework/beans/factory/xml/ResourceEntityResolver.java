@@ -74,9 +74,10 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
 	@Nullable
 	public InputSource resolveEntity(@Nullable String publicId, @Nullable String systemId)
 			throws SAXException, IOException {
-
+		//根据映射获取本地资源文件
 		InputSource source = super.resolveEntity(publicId, systemId);
 
+		//如果没有找到本地文件，则从网络中找
 		if (source == null && systemId != null) {
 			String resourcePath = null;
 			try {

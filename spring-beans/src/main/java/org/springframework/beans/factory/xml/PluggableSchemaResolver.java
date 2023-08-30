@@ -72,8 +72,13 @@ public class PluggableSchemaResolver implements EntityResolver {
 	private final String schemaMappingsLocation;
 
 	/** Stores the mapping of schema URL -> local schema path */
+	/*
+	* 记录url 和本地资源的映射关系
+	* 原子性
+	* debug的时候会调用toString()
+	* */
 	@Nullable
-	private volatile Map<String, String> schemaMappings;
+	public volatile Map<String, String> schemaMappings;
 
 
 	/**
@@ -113,6 +118,7 @@ public class PluggableSchemaResolver implements EntityResolver {
 		}
 
 		if (systemId != null) {
+			//根据systemId获取本地文件进行加载
 			String resourceLocation = getSchemaMappings().get(systemId);
 			if (resourceLocation == null && systemId.startsWith("https:")) {
 				// Retrieve canonical http schema mapping even for https declaration
@@ -154,6 +160,7 @@ public class PluggableSchemaResolver implements EntityResolver {
 						logger.debug("Loading schema mappings from [" + this.schemaMappingsLocation + "]");
 					}
 					try {
+						//从META-INF/spring.schemas 加载对应关系
 						Properties mappings =
 								PropertiesLoaderUtils.loadAllProperties(this.schemaMappingsLocation, this.classLoader);
 						if (logger.isDebugEnabled()) {

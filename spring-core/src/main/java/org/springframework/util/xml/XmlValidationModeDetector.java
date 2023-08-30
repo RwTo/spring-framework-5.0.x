@@ -87,13 +87,18 @@ public class XmlValidationModeDetector {
 	 * @see #VALIDATION_DTD
 	 * @see #VALIDATION_XSD
 	 */
+	/*
+	* 检测xml的验证模式
+	* */
 	public int detectValidationMode(InputStream inputStream) throws IOException {
 		// Peek into the file to look for DOCTYPE.
+		/*包含字符串 DOCTYPE ，就是 DTD的验证模式*/
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 		try {
 			boolean isDtdValidated = false;
 			String content;
 			while ((content = reader.readLine()) != null) {
+				/*去掉注释的正文*/
 				content = consumeCommentTokens(content);
 				if (this.inComment || !StringUtils.hasText(content)) {
 					continue;
@@ -137,6 +142,11 @@ public class XmlValidationModeDetector {
 			return false;
 		}
 		int openTagIndex = content.indexOf('<');
+		/*
+		* 判断是否是开始标签
+		* 例：<bean>
+		* 判断条件，< 后一个字符是字母
+		* */
 		return (openTagIndex > -1 && (content.length() > openTagIndex + 1) &&
 				Character.isLetter(content.charAt(openTagIndex + 1)));
 	}
