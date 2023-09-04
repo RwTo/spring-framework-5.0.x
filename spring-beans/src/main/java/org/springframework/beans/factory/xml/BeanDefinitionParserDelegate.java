@@ -412,17 +412,19 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
-		String id = ele.getAttribute(ID_ATTRIBUTE);
-		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
+		String id = ele.getAttribute(ID_ATTRIBUTE);//id
+		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);//name
 
 		List<String> aliases = new ArrayList<>();
 		if (StringUtils.hasLength(nameAttr)) {
+			//分割name，并存入别名
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
 			aliases.addAll(Arrays.asList(nameArr));
 		}
 
 		String beanName = id;
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
+			//没有指定id，使用第一个name 作为beanName
 			beanName = aliases.remove(0);
 			if (logger.isDebugEnabled()) {
 				logger.debug("No XML 'id' specified - using '" + beanName +
@@ -438,6 +440,7 @@ public class BeanDefinitionParserDelegate {
 		if (beanDefinition != null) {
 			if (!StringUtils.hasText(beanName)) {
 				try {
+					//生成beanName
 					if (containingBean != null) {
 						beanName = BeanDefinitionReaderUtils.generateBeanName(
 								beanDefinition, this.readerContext.getRegistry(), true);
@@ -475,6 +478,9 @@ public class BeanDefinitionParserDelegate {
 	 * Validate that the specified bean name and aliases have not been used already
 	 * within the current level of beans element nesting.
 	 */
+	/*
+	* 检查beanName 和 alias没有被使用
+	* */
 	protected void checkNameUniqueness(String beanName, List<String> aliases, Element beanElement) {
 		String foundName = null;
 
@@ -512,11 +518,18 @@ public class BeanDefinitionParserDelegate {
 		}
 
 		try {
+			//GenericBeanDefinition用于存放属性信息
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
-
+			//解析其他所有属性 - 硬编码
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
+			/*
+				<description>myTestBean</description>
+			* */
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
-
+			/*
+				可以通过BeanDefinition的getAttribute(key) 获取meta
+				<meta key="testStr" value="aaaa"/>
+		    */
 			parseMetaElements(ele, bd);
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
@@ -564,6 +577,7 @@ public class BeanDefinitionParserDelegate {
 		}
 		else if (containingBean != null) {
 			// Take default from containing bean in case of an inner bean definition.
+			//没有单独指定scope属性，则使用父类默认的属性
 			bd.setScope(containingBean.getScope());
 		}
 

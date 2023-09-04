@@ -3,5 +3,10 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="myTestBean" class="com.rwto.beans.MyTestBean"/>
+	<bean id="myTestBean" class="com.rwto.beans.MyTestBean" name="bean2 bean1">
+		<description>myTestBean</description>
+		<meta key="testStr" value="aaaa"/>
+	</bean>
+	<bean id="bean" class="com.rwto.beans.User" name="user user2"/>
+
 </beans>
