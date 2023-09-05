@@ -435,7 +435,7 @@ public class BeanDefinitionParserDelegate {
 		if (containingBean == null) {
 			checkNameUniqueness(beanName, aliases, ele);
 		}
-
+		//解析bean 标签属性和子标签
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
 			if (!StringUtils.hasText(beanName)) {
@@ -522,6 +522,8 @@ public class BeanDefinitionParserDelegate {
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
 			//解析其他所有属性 - 硬编码
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
+
+			/**下面是解析子元素*/
 			/*
 				<description>myTestBean</description>
 			* */
@@ -533,9 +535,36 @@ public class BeanDefinitionParserDelegate {
 			parseMetaElements(ele, bd);
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
-
+			/*
+				构造器配置
+				<bean id="myBean" class="com.rwto.beans.MyBean" name="myBean">
+					<constructor-arg index="0">
+						<value>我的bean</value>
+					</constructor-arg>
+					<constructor-arg index="1">
+						<value>1</value>
+					</constructor-arg>
+				</bean>
+			* */
 			parseConstructorArgElements(ele, bd);
+			/*
+			 通过setName 设置 属性
+			 <bean id="myBean" class="com.rwto.beans.MyBean" name="myBean">
+			 	<property name="name" value="123"/>
+			 </bean>
+			 */
 			parsePropertyElements(ele, bd);
+			/*
+			 	指定bean的限定符，与@Qualifiar类似
+			 	<bean id="myBean2" class="com.example.MyBean">
+					<qualifier value="beanA" />
+				</bean>
+				<bean id="myComponent" class="com.example.MyComponent">
+					<property name="myBean">
+						<qualifier value="beanA" /> <!-- 指定要注入的Bean名称或限定符 -->
+					</property>
+				</bean>
+			 */
 			parseQualifierElements(ele, bd);
 
 			bd.setResource(this.readerContext.getResource());
@@ -1397,11 +1426,13 @@ public class BeanDefinitionParserDelegate {
 		if (namespaceUri == null) {
 			return null;
 		}
+		//根据命名空间找到对应的处理器
 		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 		if (handler == null) {
 			error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);
 			return null;
 		}
+		//调用自定义handler解析
 		return handler.parse(ele, new ParserContext(this.readerContext, this, containingBd));
 	}
 
@@ -1428,6 +1459,7 @@ public class BeanDefinitionParserDelegate {
 		BeanDefinitionHolder finalDefinition = originalDef;
 
 		// Decorate based on custom attributes first.
+		//处理自定义属性
 		NamedNodeMap attributes = ele.getAttributes();
 		for (int i = 0; i < attributes.getLength(); i++) {
 			Node node = attributes.item(i);
@@ -1435,6 +1467,7 @@ public class BeanDefinitionParserDelegate {
 		}
 
 		// Decorate based on custom nested elements.
+		//处理子元素
 		NodeList children = ele.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
 			Node node = children.item(i);
@@ -1455,11 +1488,13 @@ public class BeanDefinitionParserDelegate {
 	 */
 	public BeanDefinitionHolder decorateIfRequired(
 			Node node, BeanDefinitionHolder originalDef, @Nullable BeanDefinition containingBd) {
-
+		//获取自定义标签的命名空间
 		String namespaceUri = getNamespaceURI(node);
-		if (namespaceUri != null && !isDefaultNamespace(namespaceUri)) {
+		if (namespaceUri != null && !isDefaultNamespace(namespaceUri)) {//非默认命名空间
+			//根据命名空间获取对应的处理类
 			NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 			if (handler != null) {
+				//修饰处理bean
 				BeanDefinitionHolder decorated =
 						handler.decorate(node, originalDef, new ParserContext(this.readerContext, this, containingBd));
 				if (decorated != null) {

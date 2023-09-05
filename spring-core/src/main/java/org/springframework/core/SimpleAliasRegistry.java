@@ -97,6 +97,9 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	 * @param alias the alias to look for
 	 * @since 4.2.1
 	 */
+	/*
+	 * name是否已经被alias 注册
+	 */
 	public boolean hasAlias(String name, String alias) {
 		for (Map.Entry<String, String> entry : this.aliasMap.entrySet()) {
 			String registeredName = entry.getValue();
@@ -199,6 +202,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	 * @see #hasAlias
 	 */
 	protected void checkForAliasCircle(String name, String alias) {
+		//如果已经存在 name -> alias了
 		if (hasAlias(alias, name)) {
 			throw new IllegalStateException("Cannot register alias '" + alias +
 					"' for name '" + name + "': Circular reference - '" +

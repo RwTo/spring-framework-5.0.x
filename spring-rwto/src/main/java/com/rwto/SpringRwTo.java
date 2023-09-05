@@ -33,6 +33,9 @@ public class SpringRwTo {
 		MyTestBean bean = (MyTestBean) bf.getBean("myTestBean");
 		System.out.println(bean.getTestStr());
 
+		User myUser = (User)bf.getBean("myUser");
+		System.out.println(myUser);
+
 	}
 
 	private static void annotationDevelopment() {

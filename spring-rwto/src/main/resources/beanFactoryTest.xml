@@ -1,12 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	   xmlns:user="http://www.rwto.com/custom/tag/user"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.rwto.com/custom/tag/user http://www.rwto.com/custom/tag/user.xsd
+	   ">
 
 	<bean id="myTestBean" class="com.rwto.beans.MyTestBean" name="bean2 bean1">
 		<description>myTestBean</description>
 		<meta key="testStr" value="aaaa"/>
 	</bean>
-	<bean id="bean" class="com.rwto.beans.User" name="user user2"/>
+	<bean id="bean" class="com.rwto.beans.User" name="user user2">
+	</bean>
+	<alias name="bean" alias="bean1"/>
 
+	<bean id="myBean" class="com.rwto.beans.MyBean" name="myBean">
+		<constructor-arg index="0">
+			<value>我的bean</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>1</value>
+		</constructor-arg>
+		<property name="name" value="123"/>
+	</bean>
+
+	<!--自定义标签-->
+	<user:user id="myUser" name="我的标签"/>
 </beans>
