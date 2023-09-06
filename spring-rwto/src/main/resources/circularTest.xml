@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:user="http://www.rwto.com/custom/tag/user"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.rwto.com/custom/tag/user http://www.rwto.com/custom/tag/user.xsd
+	   ">
+
+	<!--循环依赖-->
+	<!--构造器循环依赖，没办法解决，只能抛异常-->
+	<!--
+		singletonsCurrentlyInCreation 记录正在创建的bean
+		如果将要创建的bean，已经正在创建了，抛出异常
+	-->
+
+	<!--
+	<bean id="testA" class="com.rwto.beans.circular.TestA">
+		<constructor-arg ref="testB"/>
+	</bean>
+	<bean id="testB" class="com.rwto.beans.circular.TestB">
+		<constructor-arg ref="testC"/>
+	</bean>
+	<bean id="testC" class="com.rwto.beans.circular.TestC">
+		<constructor-arg ref="testA"/>
+	</bean>
+	-->
+	<!--setter循环依赖，可以解决-->
+	<!--
+		1. spring是通过提前暴露刚完成构造器注入但未完成其他步骤的bean完成的
+		2. 只能解决单例bean的循环依赖，原型模式不能解决，因为原型模式spring不缓存prototype作用域的bean，因此无法提前暴露
+		3. 通过提前暴露一个单例工厂，从而使其他bean
+	-->
+	<bean id="testA" class="com.rwto.beans.circular.TestA">
+		<property name="testB" ref="testB"/>
+	</bean>
+	<bean id="testB" class="com.rwto.beans.circular.TestB">
+		<property name="testC" ref="testC"/>
+	</bean>
+	<bean id="testC" class="com.rwto.beans.circular.TestC">
+		<property name="testA" ref="testA"/>
+	</bean>
+</beans>

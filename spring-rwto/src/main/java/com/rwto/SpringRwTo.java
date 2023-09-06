@@ -2,6 +2,7 @@ package com.rwto;
 
 import com.rwto.beans.MyTestBean;
 import com.rwto.beans.User;
+import com.rwto.beans.factorybean.Car;
 import com.rwto.config.SpringConfig;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
@@ -36,6 +37,11 @@ public class SpringRwTo {
 		User myUser = (User)bf.getBean("myUser");
 		System.out.println(myUser);
 
+		Car myCar = (Car)bf.getBean("myCar");
+		System.out.println(myCar);
+
+		Object myCar2 = bf.getBean("&myCar");
+		System.out.println(myCar2);
 	}
 
 	private static void annotationDevelopment() {
