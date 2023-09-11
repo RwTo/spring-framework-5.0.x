@@ -107,6 +107,7 @@ class BeanDefinitionValueResolver {
 		// to another bean to be resolved.
 		if (value instanceof RuntimeBeanReference) {
 			RuntimeBeanReference ref = (RuntimeBeanReference) value;
+			/**递归实例化所需要的bean*/
 			return resolveReference(argName, ref);
 		}
 		else if (value instanceof RuntimeBeanNameReference) {
@@ -300,6 +301,7 @@ class BeanDefinitionValueResolver {
 				bean = this.beanFactory.getParentBeanFactory().getBean(refName);
 			}
 			else {
+				/*getBean 递归实例化所需要的bean*/
 				bean = this.beanFactory.getBean(refName);
 				this.beanFactory.registerDependentBean(refName, this.beanName);
 			}

@@ -33,8 +33,8 @@
 	<bean id="testA" class="com.rwto.beans.circular.TestA">
 		<property name="testB" ref="testB"/>
 	</bean>
-	<bean id="testB" class="com.rwto.beans.circular.TestB">
-		<property name="testC" ref="testC"/>
+	<bean id="testB" class="com.rwto.beans.circular.TestB" autowire="byType">
+		<!--使用了byType 根据类型注入，不需要自己指定属性值了-->
 	</bean>
 	<bean id="testC" class="com.rwto.beans.circular.TestC">
 		<property name="testA" ref="testA"/>

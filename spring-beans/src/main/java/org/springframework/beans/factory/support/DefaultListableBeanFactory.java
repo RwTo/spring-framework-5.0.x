@@ -1064,7 +1064,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		else if (javaxInjectProviderClass == descriptor.getDependencyType()) {
 			return new Jsr330ProviderFactory().createDependencyProvider(descriptor, requestingBeanName);
 		}
-		else {
+		//以上都是特殊处理的类
+		else {//通用处理
 			Object result = getAutowireCandidateResolver().getLazyResolutionProxyIfNecessary(
 					descriptor, requestingBeanName);
 			if (result == null) {
@@ -1086,6 +1087,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 
 			Class<?> type = descriptor.getDependencyType();
+			/**用于支持注解@Value*/
 			Object value = getAutowireCandidateResolver().getSuggestedValue(descriptor);
 			if (value != null) {
 				if (value instanceof String) {
@@ -1098,7 +1100,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						converter.convertIfNecessary(value, type, descriptor.getField()) :
 						converter.convertIfNecessary(value, type, descriptor.getMethodParameter()));
 			}
-
+			//解析批量bean 集合类型
 			Object multipleBeans = resolveMultipleBeans(descriptor, beanName, autowiredBeanNames, typeConverter);
 			if (multipleBeans != null) {
 				return multipleBeans;
@@ -1116,6 +1118,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			Object instanceCandidate;
 
 			if (matchingBeans.size() > 1) {
+				//确定bean
 				autowiredBeanName = determineAutowireCandidate(matchingBeans, descriptor);
 				if (autowiredBeanName == null) {
 					if (isRequired(descriptor) || !indicatesMultipleBeans(type)) {
@@ -1141,6 +1144,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				autowiredBeanNames.add(autowiredBeanName);
 			}
 			if (instanceCandidate instanceof Class) {
+				//getBean 实例化
 				instanceCandidate = descriptor.resolveCandidate(autowiredBeanName, type, this);
 			}
 			Object result = instanceCandidate;
@@ -1165,6 +1169,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			@Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) {
 
 		Class<?> type = descriptor.getDependencyType();
+		//如果属性是数组，根据类型找到所有匹配的bean
 		if (type.isArray()) {
 			Class<?> componentType = type.getComponentType();
 			ResolvableType resolvableType = descriptor.getResolvableType();
@@ -1176,6 +1181,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			if (componentType == null) {
 				return null;
 			}
+			/**
+			  根据属性类型找到beanfactory中所有类型的匹配bean
+			  返回map beanName->instance   通过getBean返回的实例 （递归）
+			 * */
 			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, componentType,
 					new MultiElementDescriptor(descriptor));
 			if (matchingBeans.isEmpty()) {
@@ -1184,6 +1193,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			if (autowiredBeanNames != null) {
 				autowiredBeanNames.addAll(matchingBeans.keySet());
 			}
+			//转换器转换类型
 			TypeConverter converter = (typeConverter != null ? typeConverter : getTypeConverter());
 			Object result = converter.convertIfNecessary(matchingBeans.values(), type);
 			if (getDependencyComparator() != null && result instanceof Object[]) {
@@ -1192,6 +1202,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			return result;
 		}
 		else if (Collection.class.isAssignableFrom(type) && type.isInterface()) {
+			//Collection 类型
 			Class<?> elementType = descriptor.getResolvableType().asCollection().resolveGeneric();
 			if (elementType == null) {
 				return null;
@@ -1212,6 +1223,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			return result;
 		}
 		else if (Map.class == type) {
+			//Map类型
 			ResolvableType mapType = descriptor.getResolvableType().asMap();
 			Class<?> keyType = mapType.resolveGeneric(0);
 			if (String.class != keyType) {
@@ -1328,10 +1340,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			DependencyDescriptor descriptor, Class<?> requiredType) {
 
 		if (descriptor instanceof MultiElementDescriptor || containsSingleton(candidateName)) {
+			// getBean 实例化  递归
 			Object beanInstance = descriptor.resolveCandidate(candidateName, requiredType, this);
 			candidates.put(candidateName, (beanInstance instanceof NullBean ? null : beanInstance));
 		}
 		else {
+			//getType 获取class 类型
 			candidates.put(candidateName, getType(candidateName));
 		}
 	}
