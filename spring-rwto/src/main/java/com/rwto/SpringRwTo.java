@@ -25,7 +25,6 @@ public class SpringRwTo {
 		//注解开发
 		//annotationDevelopment();
 
-
 	}
 
 	private static void xmlDevelopment() {
