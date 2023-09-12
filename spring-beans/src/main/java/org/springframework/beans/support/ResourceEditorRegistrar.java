@@ -99,6 +99,7 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 	 */
 	@Override
 	public void registerCustomEditors(PropertyEditorRegistry registry) {
+		/*注册一些常用类的属性编辑器*/
 		ResourceEditor baseEditor = new ResourceEditor(this.resourceLoader, this.propertyResolver);
 		doRegisterEditor(registry, Resource.class, baseEditor);
 		doRegisterEditor(registry, ContextResource.class, baseEditor);
@@ -113,7 +114,7 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 		doRegisterEditor(registry, URI.class, new URIEditor(classLoader));
 		doRegisterEditor(registry, Class.class, new ClassEditor(classLoader));
 		doRegisterEditor(registry, Class[].class, new ClassArrayEditor(classLoader));
-
+		//ClassPathXmlApplicationContext instanceof ResourcePatternResolver
 		if (this.resourceLoader instanceof ResourcePatternResolver) {
 			doRegisterEditor(registry, Resource[].class,
 					new ResourceArrayPropertyEditor((ResourcePatternResolver) this.resourceLoader, this.propertyResolver));
@@ -129,6 +130,7 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 			((PropertyEditorRegistrySupport) registry).overrideDefaultEditor(requiredType, editor);
 		}
 		else {
+			/**自定义解析器*/
 			registry.registerCustomEditor(requiredType, editor);
 		}
 	}

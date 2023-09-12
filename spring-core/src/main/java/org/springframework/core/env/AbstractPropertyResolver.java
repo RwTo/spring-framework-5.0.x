@@ -144,11 +144,13 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	@Override
 	public void validateRequiredProperties() {
 		MissingRequiredPropertiesException ex = new MissingRequiredPropertiesException();
+		/*需要的属性*/
 		for (String key : this.requiredProperties) {
 			if (this.getProperty(key) == null) {
 				ex.addMissingRequiredProperty(key);
 			}
 		}
+		/*如果需要的属性找不到，抛出异常*/
 		if (!ex.getMissingRequiredProperties().isEmpty()) {
 			throw ex;
 		}

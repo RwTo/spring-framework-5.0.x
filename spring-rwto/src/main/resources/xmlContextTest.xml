@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:user="http://www.rwto.com/custom/tag/user"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.rwto.com/custom/tag/user http://www.rwto.com/custom/tag/user.xsd
+	   ">
+
+	<bean id="str" class="java.lang.String">
+		<constructor-arg value="123"/>
+	</bean>
+	<bean name="xmlBean" class="com.rwto.beans.context.xml.XmlBean" autowire="byType">
+		<property name="str" value="#{str}"/>
+		<property name="date" >
+			<value type="java.util.Date">2023-09-12</value>
+		</property>
+		<property name="msg" value="${msg}"/>
+	</bean>
+
+	<!--自定义编辑器-->
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<!--以下属性二选一即可-->
+		<property name="customEditors">
+			<map>
+				<entry key="java.util.Date" value="com.rwto.beans.context.xml.DatePropertyEditor">
+				</entry>
+			</map>
+		</property>
+		<property name="propertyEditorRegistrars">
+			<list>
+				<bean class="com.rwto.beans.context.xml.DatePropertyEditorRegistrar"/>
+			</list>
+		</property>
+	</bean>
+	<!--
+	所有实现了BeanFactoryPostProcessor 接口的类，
+	在配置bean时，都会在bean工厂载入所有bean的配置之后,实例化之前 执行 postProcessBeanFactory()方法
+	-->
+	<bean id="msgHandler" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>
+					config/bean.properties
+				</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean class="com.rwto.beans.context.xml.ObscenityRemovingBeanFactoryPostProcessor">
+		<property name="obscenities">
+			<set>
+				<value>fuck</value>
+				<value>sb</value>
+			</set>
+		</property>
+	</bean>
+
+	<bean id="simpleBean" class="com.rwto.beans.context.xml.SimpleBean">
+		<property name="userName" value="test"/>
+		<property name="desc" value="fuck"/>
+		<property name="password" value="sb"/>
+	</bean>
+
+</beans>

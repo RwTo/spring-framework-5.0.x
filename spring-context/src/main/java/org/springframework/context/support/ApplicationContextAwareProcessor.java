@@ -77,6 +77,7 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 	@Override
 	@Nullable
 	public Object postProcessBeforeInitialization(final Object bean, String beanName) throws BeansException {
+		/*初始化方法前执行*/
 		AccessControlContext acc = null;
 
 		if (System.getSecurityManager() != null &&
@@ -100,6 +101,7 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 	}
 
 	private void invokeAwareInterfaces(Object bean) {
+		/*实现了Aware 接口的bean，初始化时和初始化后可以获得一些信息*/
 		if (bean instanceof Aware) {
 			if (bean instanceof EnvironmentAware) {
 				((EnvironmentAware) bean).setEnvironment(this.applicationContext.getEnvironment());
@@ -123,6 +125,7 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 	}
 
 	@Override
+	/*初始化方法后执行*/
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		return bean;
 	}

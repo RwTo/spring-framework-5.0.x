@@ -1183,7 +1183,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @param bw the BeanWrapper to initialize
 	 */
 	protected void initBeanWrapper(BeanWrapper bw) {
+		/*初始化BeanWrapper*/
 		bw.setConversionService(getConversionService());
+		/*注册自定义属性解析器*/
 		registerCustomEditors(bw);
 	}
 
@@ -1198,6 +1200,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected void registerCustomEditors(PropertyEditorRegistry registry) {
 		PropertyEditorRegistrySupport registrySupport =
 				(registry instanceof PropertyEditorRegistrySupport ? (PropertyEditorRegistrySupport) registry : null);
+
 		if (registrySupport != null) {
 			registrySupport.useConfigValueEditors();
 		}

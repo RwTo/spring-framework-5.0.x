@@ -33,15 +33,15 @@
 
 	<!--循环依赖-->
 	<!--构造器循环依赖，没办法解决，只能抛异常-->
-	<bean id="testA" class="com.rwto.beans.circular.TestA">
-		<constructor-arg ref="testB"/>
-	</bean>
-	<bean id="testB" class="com.rwto.beans.circular.TestB">
-		<constructor-arg ref="testC"/>
-	</bean>
-	<bean id="testC" class="com.rwto.beans.circular.TestC">
-		<constructor-arg ref="testA"/>
-	</bean>
+<!--	<bean id="testA" class="com.rwto.beans.circular.TestA">-->
+<!--		<constructor-arg ref="testB"/>-->
+<!--	</bean>-->
+<!--	<bean id="testB" class="com.rwto.beans.circular.TestB">-->
+<!--		<constructor-arg ref="testC"/>-->
+<!--	</bean>-->
+<!--	<bean id="testC" class="com.rwto.beans.circular.TestC">-->
+<!--		<constructor-arg ref="testA"/>-->
+<!--	</bean>-->
 
 	<!--setter循环依赖，可以解决-->
 </beans>
