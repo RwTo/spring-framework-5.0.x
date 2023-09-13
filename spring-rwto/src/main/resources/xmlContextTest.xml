@@ -61,4 +61,6 @@
 		<property name="password" value="sb"/>
 	</bean>
 
+	<!--BeanPostProcessor-->
+	<bean class="com.rwto.beans.context.xml.MyInstantiationAwareBeanPostProcessor"/>
 </beans>
