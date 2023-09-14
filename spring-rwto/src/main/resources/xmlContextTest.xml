@@ -63,4 +63,28 @@
 
 	<!--BeanPostProcessor-->
 	<bean class="com.rwto.beans.context.xml.MyInstantiationAwareBeanPostProcessor"/>
+
+	<!--国际化配置 必须是messageSource-->
+	<bean id ="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>config/messages</value>
+			</list>
+		</property>
+		<property name="defaultEncoding" value="UTF-8"/>
+	</bean>
+
+	<!--事件监听器-->
+	<bean id="listener" class="com.rwto.beans.context.xml.TestListener"/>
+
+	<!--conversionService-->
+	<!--这里使用的是FactoryBean，Spring会识别其内部元素做类型匹配-->
+	<!--ConversionServiceFactoryBean 有很多默认的转换器-->
+	<bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+		<property name="converters">
+			<list>
+				<bean class="com.rwto.beans.context.xml.String2DateConverter"/>
+			</list>
+		</property>
+	</bean>
 </beans>

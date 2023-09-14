@@ -18,7 +18,7 @@ public class MyInstantiationAwareBeanPostProcessor implements InstantiationAware
 	@Override
 	public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
 		System.out.println("=================end:"+bean.getClass()+"===================");
-		return false;
+		return true;
 	}
 
 }
