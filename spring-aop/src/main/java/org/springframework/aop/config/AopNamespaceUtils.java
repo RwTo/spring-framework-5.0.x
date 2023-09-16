@@ -73,19 +73,34 @@ public abstract class AopNamespaceUtils {
 
 	public static void registerAspectJAnnotationAutoProxyCreatorIfNecessary(
 			ParserContext parserContext, Element sourceElement) {
+		//注册或升级AutoProxyCreator 定义beanName为internalAutoProxyCreator 的beanDefinition
 
 		BeanDefinition beanDefinition = AopConfigUtils.registerAspectJAnnotationAutoProxyCreatorIfNecessary(
 				parserContext.getRegistry(), parserContext.extractSource(sourceElement));
+		//对于proxy-target-class以及expose-proxy属性进行处理
 		useClassProxyingIfNecessary(parserContext.getRegistry(), sourceElement);
+		//注册组件并通知，便于监听器进一步处理
+
 		registerComponentIfNecessary(beanDefinition, parserContext);
 	}
 
+	/**
+	 proxy-target-class  true: 使用cglib创建代理对象  false：尽量使用jdk动态代理创建对象（需要实现接口，没有实现接口，还是使用cglib）
+	 expose-proxy  true：允许当前对象获取当前对象的代理类
+	 获取当前对象的代理对象：
+	 AopProxyUtils.ultimateTargetClass(AopProxyUtils.ultimateTargetClass(this))  更通用 ，
+	 获取当前对象的最终对象 expose-proxy 为false时 获取最终目标类
+	 AopContext.currentProxy()  对于cglib不生效
+	 * */
 	private static void useClassProxyingIfNecessary(BeanDefinitionRegistry registry, @Nullable Element sourceElement) {
+		/**本质是设置 internalAutoProxyCreator的属性*/
 		if (sourceElement != null) {
+			/**处理属性 proxy-target-class*/
 			boolean proxyTargetClass = Boolean.parseBoolean(sourceElement.getAttribute(PROXY_TARGET_CLASS_ATTRIBUTE));
 			if (proxyTargetClass) {
 				AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);
 			}
+			/**处理属性 expose-proxy*/
 			boolean exposeProxy = Boolean.parseBoolean(sourceElement.getAttribute(EXPOSE_PROXY_ATTRIBUTE));
 			if (exposeProxy) {
 				AopConfigUtils.forceAutoProxyCreatorToExposeProxy(registry);
