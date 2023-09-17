@@ -72,7 +72,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	@Nullable
 	protected Object[] getAdvicesAndAdvisorsForBean(
 			Class<?> beanClass, String beanName, @Nullable TargetSource targetSource) {
-
+		/*寻找合格的增强器*/
 		List<Advisor> advisors = findEligibleAdvisors(beanClass, beanName);
 		if (advisors.isEmpty()) {
 			return DO_NOT_PROXY;
@@ -93,7 +93,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
 		/**找到增强器候选人*/
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
-		/**确认候选增强器*/
+		/**确认候选增强器，寻找匹配的增强器*/
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
 		/**扩展增强器*/
 		extendAdvisors(eligibleAdvisors);
@@ -108,6 +108,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 * @return the List of candidate Advisors
 	 */
 	protected List<Advisor> findCandidateAdvisors() {
+		//这里会使用父类方法加载配置文件中的AOP声明
 		Assert.state(this.advisorRetrievalHelper != null, "No BeanFactoryAdvisorRetrievalHelper available");
 		return this.advisorRetrievalHelper.findAdvisorBeans();
 	}

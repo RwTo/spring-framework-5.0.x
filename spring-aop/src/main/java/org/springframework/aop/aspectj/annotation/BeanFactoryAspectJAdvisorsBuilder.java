@@ -89,6 +89,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 				if (aspectNames == null) {
 					List<Advisor> advisors = new ArrayList<>();
 					aspectNames = new ArrayList<>();
+					/**遍历所有的bean，找出声明了AspectJ注解的类*/
 					String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
 							this.beanFactory, Object.class, true, false);
 					for (String beanName : beanNames) {
@@ -97,16 +98,19 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 						}
 						// We must be careful not to instantiate beans eagerly as in this case they
 						// would be cached by the Spring container but would not have been weaved.
+						//获取bean的类型
 						Class<?> beanType = this.beanFactory.getType(beanName);
 						if (beanType == null) {
 							continue;
 						}
+						/**如果是AspectJ类*/
 						if (this.advisorFactory.isAspect(beanType)) {
 							aspectNames.add(beanName);
 							AspectMetadata amd = new AspectMetadata(beanType, beanName);
 							if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
 								MetadataAwareAspectInstanceFactory factory =
 										new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);
+								/**解析标记了AspectJ注解中的增强方法*/
 								List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory);
 								if (this.beanFactory.isSingleton(beanName)) {
 									this.advisorsCache.put(beanName, classAdvisors);
@@ -138,6 +142,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 		if (aspectNames.isEmpty()) {
 			return Collections.emptyList();
 		}
+		//从缓存中获取
 		List<Advisor> advisors = new ArrayList<>();
 		for (String aspectName : aspectNames) {
 			List<Advisor> cachedAdvisors = this.advisorsCache.get(aspectName);

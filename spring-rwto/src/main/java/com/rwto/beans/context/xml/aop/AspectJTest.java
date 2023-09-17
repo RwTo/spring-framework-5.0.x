@@ -11,29 +11,29 @@ public class AspectJTest {
 
 	/**execution(public User com.itheima.service.UserService.findById(int) Exception)*/
 	@Pointcut("execution(* *.test(..))")
-	public void test(){
+	public void pointcut(){
 
 	}
-	@Before("test()")
+	@Before("pointcut()")
 	public void beforeTest(){
 		System.out.println("beforeTest");
 	}
 
-	@After("test()")
+	@After("pointcut()")
 	public void afterTest(){
 		System.out.println("afterTest");
 	}
 
-	@Around("test()")
+	@Around("pointcut()")
 	public Object aroundTest(ProceedingJoinPoint p){
-		System.out.println("before");
+		System.out.println("beforeAround");
 		Object o = null;
 		try {
 			o = p.proceed();
 		} catch (Throwable throwable) {
 			throwable.printStackTrace();
 		}
-		System.out.println("after");
+		System.out.println("afterAround");
 		return o;
 	}
 }
