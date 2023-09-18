@@ -342,7 +342,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		if (StringUtils.hasLength(beanName) && this.targetSourcedBeans.contains(beanName)) {
 			return bean;
 		}
-		//不建议代理的类
+		//不建议代理的类,没有匹配的增强器
 		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
 			return bean;
 		}
@@ -359,7 +359,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		//如果获取到了增强，则需要针对增强创建代理
 		if (specificInterceptors != DO_NOT_PROXY) {
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
-			//创建代理
+			/**创建代理*/
 			Object proxy = createProxy(
 					bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
 			this.proxyTypes.put(cacheKey, proxy.getClass());
@@ -449,6 +449,14 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 * @return the AOP proxy for the bean
 	 * @see #buildAdvisors
 	 */
+	/**
+	 proxy-target-class  true: 使用cglib创建代理对象  false：尽量使用jdk动态代理创建对象（需要实现接口，没有实现接口，还是使用cglib）
+	 expose-proxy  true：允许当前对象获取当前对象的代理类
+	 获取当前对象的代理对象：
+	 AopProxyUtils.ultimateTargetClass(AopProxyUtils.ultimateTargetClass(this))  更通用 ，
+	 获取当前对象的最终对象 expose-proxy 为false时 获取最终目标类
+	 AopContext.currentProxy()  对于cglib不生效
+	 * */
 	protected Object createProxy(Class<?> beanClass, @Nullable String beanName,
 			@Nullable Object[] specificInterceptors, TargetSource targetSource) {
 
@@ -457,27 +465,39 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		}
 
 		ProxyFactory proxyFactory = new ProxyFactory();
+		/**获取当前类中相关属性*/
 		proxyFactory.copyFrom(this);
 
+		/**决定对于给定的bean是否应该使用targetClass而不是他的接口代理*/
+		/**targetClass 为 true 使用 cglib代理 ，false 尽量使用jdk动态代理*/
 		if (!proxyFactory.isProxyTargetClass()) {
+			/** org.springframework.aop.framework.autoproxy.AutoProxyUtils.preserveTargetClass 属性为true 使用cglib*/
 			if (shouldProxyTargetClass(beanClass, beanName)) {
 				proxyFactory.setProxyTargetClass(true);
 			}
 			else {
+				/**判断是否这个类是否有接口实现，如果没有使用cglib，否则使用jdk*/
 				evaluateProxyInterfaces(beanClass, proxyFactory);
 			}
 		}
-
+		/**封装拦截器为真正的增强器*/
 		Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
+		/**添加增强器*/
 		proxyFactory.addAdvisors(advisors);
+		/**添加目标类*/
 		proxyFactory.setTargetSource(targetSource);
+		/**用户自定义的方法，子类实现*/
 		customizeProxyFactory(proxyFactory);
 
+		/**用来控制代理工厂被配置后，是否还允许修改通知
+		 * 默认为false，即代理被配置后，不允许修改代理的配置
+		 * */
 		proxyFactory.setFrozen(this.freezeProxy);
 		if (advisorsPreFiltered()) {
 			proxyFactory.setPreFiltered(true);
 		}
 
+		/**生成代理*/
 		return proxyFactory.getProxy(getProxyClassLoader());
 	}
 
@@ -519,11 +539,14 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 */
 	protected Advisor[] buildAdvisors(@Nullable String beanName, @Nullable Object[] specificInterceptors) {
 		// Handle prototypes correctly...
+		/**解析所有的普通拦截器名称*/
 		Advisor[] commonInterceptors = resolveInterceptorNames();
 
 		List<Object> allInterceptors = new ArrayList<>();
 		if (specificInterceptors != null) {
+			/**加入拦截器*/
 			allInterceptors.addAll(Arrays.asList(specificInterceptors));
+			/**合并*/
 			if (commonInterceptors.length > 0) {
 				if (this.applyCommonInterceptorsFirst) {
 					allInterceptors.addAll(0, Arrays.asList(commonInterceptors));
@@ -541,7 +564,9 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		}
 
 		Advisor[] advisors = new Advisor[allInterceptors.size()];
+		/**Spring存在多种增强方式，比如增强方法和拦截器，这里统一处理成增强器*/
 		for (int i = 0; i < allInterceptors.size(); i++) {
+			/*将拦截器封装为增强器*/
 			advisors[i] = this.advisorAdapterRegistry.wrap(allInterceptors.get(i));
 		}
 		return advisors;

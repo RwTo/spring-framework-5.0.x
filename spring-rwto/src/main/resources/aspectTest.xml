@@ -12,6 +12,8 @@
 		>
 	<aop:aspectj-autoproxy/>
 
-	<bean id="aop" class="com.rwto.beans.context.xml.aop.AopTest"/>
+	<bean id="aop" class="com.rwto.beans.context.xml.aop.AopTest">
+
+	</bean>
 	<bean class="com.rwto.beans.context.xml.aop.AspectJTest"/>
 </beans>
